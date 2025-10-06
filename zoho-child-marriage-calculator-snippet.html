@@ -1,0 +1,239 @@
+<!-- Child Marriage Calculator - Zoho Sites snippet (single column) -->
+<div id="zmc-child-marriage" class="zmc">
+  <style>
+    /* Scoped styles to .zmc to avoid site-wide conflicts */
+    .zmc { --blue-900:#0d47a1; --blue-700:#1565c0; --blue-100:#e3f2fd; --gray-100:#f7f8fa; --gray-300:#dbe0e6; --text-900:#0f172a; --text-700:#334155; --white:#fff; --error:#c62828; }
+    .zmc { color: var(--text-900); background: var(--white); font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; border:1px solid var(--gray-300); border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+    .zmc .zmc-header { background: var(--blue-900); color: var(--white); padding: 18px 16px; }
+    .zmc .zmc-header h2 { margin:0; font-size:20px; font-weight:700; }
+    .zmc .zmc-header p { margin:6px 0 0; font-size:13px; opacity:.95; }
+
+    .zmc .zmc-body { padding:16px; background: var(--white); }
+
+    .zmc .zmc-card { background: var(--white); border:1px solid var(--gray-300); border-radius:10px; margin-bottom:14px; }
+    .zmc .zmc-card h3 { margin:0; padding:12px 14px; font-size:16px; color: var(--blue-900); border-bottom:1px solid var(--gray-300); }
+    .zmc .zmc-card .zmc-card-body { padding:14px; }
+
+    /* Single-column form */
+    .zmc .zmc-field { margin-bottom:12px; }
+    .zmc .zmc-field label { display:block; font-size:14px; color: var(--text-700); margin-bottom:6px; }
+    .zmc input[type="number"], .zmc input[type="text"] { width:100%; padding:10px 12px; border:1px solid var(--gray-300); border-radius:8px; outline:0; background: var(--white); color: var(--text-900); transition: border-color .15s ease, box-shadow .15s ease; }
+    .zmc input[type="number"]:focus, .zmc input[type="text"]:focus { border-color: var(--blue-700); box-shadow: 0 0 0 3px rgba(21,101,192,.12); }
+    .zmc .zmc-hint { font-size:12px; color: var(--text-700); opacity:.8; margin-top:4px; }
+    .zmc .zmc-error { border-color: var(--error) !important; box-shadow: 0 0 0 3px rgba(198,40,40,.12) !important; }
+
+    .zmc .zmc-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+    .zmc .zmc-btn { appearance:none; border:none; border-radius:8px; padding:10px 16px; font-weight:700; letter-spacing:.2px; cursor:pointer; }
+    .zmc .zmc-btn-primary { background: var(--blue-900); color: var(--white); }
+    .zmc .zmc-btn-primary:hover { background: var(--blue-700); }
+    .zmc .zmc-btn-secondary { background: var(--white); color: var(--blue-900); border:1px solid var(--blue-900); }
+    .zmc .zmc-btn-secondary:hover { background: var(--blue-100); color: var(--blue-700); border-color: var(--blue-700); }
+
+    .zmc .zmc-results { display:grid; grid-template-columns: 1fr; gap:10px; }
+    .zmc .zmc-result { padding:10px 12px; border:1px dashed var(--gray-300); border-radius:8px; background:#fcfdff; }
+    .zmc .zmc-label { font-size:12px; color: var(--text-700); margin-bottom:4px; }
+    .zmc .zmc-value { font-size:18px; font-weight:800; color: var(--blue-900); }
+
+    .zmc .zmc-note { font-size:12px; color: var(--text-700); margin-top:8px; }
+    .zmc .hidden { display:none; }
+  </style>
+
+  <div class="zmc-header">
+    <h2>Child Marriage Expense Calculator</h2>
+    <p>Plan for your child's wedding using inflation and returns.</p>
+  </div>
+
+  <div class="zmc-body">
+    <div class="zmc-card">
+      <h3>Inputs</h3>
+      <div class="zmc-card-body">
+        <form id="zmc-form" novalidate>
+          <div class="zmc-field">
+            <label for="zmc-age-today">1. What is age of your child today (Years)</label>
+            <input id="zmc-age-today" type="number" inputmode="numeric" min="1" max="25" step="1" placeholder="e.g. 10" required />
+            <div class="zmc-hint">Minimum 1, Maximum 25</div>
+          </div>
+
+          <div class="zmc-field">
+            <label for="zmc-age-marry">2. At what age will your child get married (Years)</label>
+            <input id="zmc-age-marry" type="number" inputmode="numeric" min="18" max="35" step="1" placeholder="e.g. 25" required />
+            <div class="zmc-hint">Minimum 18, Maximum 35</div>
+          </div>
+
+          <div class="zmc-field">
+            <label for="zmc-wedding-cost">3. Wedding cost at today's prices (Rs.)</label>
+            <input id="zmc-wedding-cost" type="text" inputmode="numeric" placeholder="e.g. 15,00,000" pattern="[0-9,\u00A0\s]*" />
+            <div class="zmc-hint">Minimum 0, Maximum 15,00,00,000</div>
+          </div>
+
+          <div class="zmc-field">
+            <label for="zmc-annual-savings">4. Your annual savings presently (Rs.)</label>
+            <input id="zmc-annual-savings" type="text" inputmode="numeric" placeholder="e.g. 25,000" pattern="[0-9,\u00A0\s]*" />
+            <div class="zmc-hint">Minimum 0, Maximum 10,00,000</div>
+          </div>
+
+          <div class="zmc-field">
+            <label for="zmc-existing-savings">5. Already saved for marriage (Rs.)</label>
+            <input id="zmc-existing-savings" type="text" inputmode="numeric" placeholder="e.g. 50,000" pattern="[0-9,\u00A0\s]*" />
+            <div class="zmc-hint">Minimum 0, Maximum 10,00,00,000</div>
+          </div>
+
+          <div class="zmc-field">
+            <label for="zmc-rate-return">6. Expected rate of return (%)</label>
+            <input id="zmc-rate-return" type="number" inputmode="decimal" min="1" max="25" step="0.01" placeholder="e.g. 12" required />
+            <div class="zmc-hint">Minimum 1%, Maximum 25%</div>
+          </div>
+
+          <div class="zmc-field">
+            <label for="zmc-inflation">7. Expected inflation rate (%)</label>
+            <input id="zmc-inflation" type="number" inputmode="decimal" min="0" max="15" step="0.01" placeholder="e.g. 10" required />
+            <div class="zmc-hint">Minimum 0%, Maximum 15%</div>
+          </div>
+
+          <div class="zmc-actions">
+            <button type="submit" class="zmc-btn zmc-btn-primary">Calculate</button>
+            <button type="button" id="zmc-reset" class="zmc-btn zmc-btn-secondary">Reset</button>
+          </div>
+        </form>
+        <div class="zmc-note">Values are estimates for education only; not financial advice.</div>
+      </div>
+    </div>
+
+    <div class="zmc-card" id="zmc-results-card" aria-live="polite">
+      <h3>Result</h3>
+      <div class="zmc-card-body">
+        <div class="zmc-results">
+          <div class="zmc-result">
+            <div class="zmc-label">Inflation adjusted future cost of marriage of your child (Rs.)</div>
+            <div id="zmc-future-cost" class="zmc-value">—</div>
+          </div>
+          <div class="zmc-result">
+            <div class="zmc-label">Future value of your annual savings (Rs.)</div>
+            <div id="zmc-fv-annual" class="zmc-value">—</div>
+          </div>
+          <div class="zmc-result">
+            <div class="zmc-label">Your existing savings will grow to (Rs.)</div>
+            <div id="zmc-fv-existing" class="zmc-value">—</div>
+          </div>
+          <div class="zmc-result">
+            <div class="zmc-label">Additional funds required to meet wedding expenses (Rs.)</div>
+            <div id="zmc-gap" class="zmc-value">—</div>
+          </div>
+          <div class="zmc-result">
+            <div class="zmc-label">One time investment required (Rs.)</div>
+            <div id="zmc-lumpsum" class="zmc-value">—</div>
+          </div>
+          <div class="zmc-result">
+            <div class="zmc-label">Annual investments required (Rs.)</div>
+            <div id="zmc-annual-req" class="zmc-value">—</div>
+          </div>
+          <div class="zmc-result">
+            <div class="zmc-label">Monthly investments required (Rs.)</div>
+            <div id="zmc-monthly-req" class="zmc-value">—</div>
+          </div>
+        </div>
+        <div class="zmc-note">* Depending on your convenience, you have the option of making either One time investment or Annual investments or Monthly investments</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function attachZmcCalculator(rootId){
+      var root = document.getElementById(rootId);
+      if (!root) return;
+
+      var Rs = function(n){ return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.round(n)); };
+      var sanitizeMoney = function(val){
+        if (val == null) return 0;
+        var clean = String(val).replace(/[\s,\u00A0,]/g, '').replace(/[^0-9.]/g, '');
+        if (clean === '') return 0;
+        var num = Number(clean);
+        return Number.isFinite(num) ? num : 0;
+      };
+      var getNumber = function(el){ if (!el) return NaN; if (el.type === 'text') return sanitizeMoney(el.value); var v = Number(el.value); return Number.isFinite(v) ? v : NaN; };
+      var setError = function(el, flag){ if (!el) return; if (flag) el.classList.add('zmc-error'); else el.classList.remove('zmc-error'); };
+      var within = function(v, min, max){ return v >= min && v <= max; };
+
+      var form = root.querySelector('#zmc-form');
+      var ageTodayEl = root.querySelector('#zmc-age-today');
+      var ageMarryEl = root.querySelector('#zmc-age-marry');
+      var weddingCostEl = root.querySelector('#zmc-wedding-cost');
+      var annualSavingsEl = root.querySelector('#zmc-annual-savings');
+      var existingSavingsEl = root.querySelector('#zmc-existing-savings');
+      var returnRateEl = root.querySelector('#zmc-rate-return');
+      var inflationEl = root.querySelector('#zmc-inflation');
+
+      var resultsCard = root.querySelector('#zmc-results-card');
+      var futureCostEl = root.querySelector('#zmc-future-cost');
+      var fvAnnualEl = root.querySelector('#zmc-fv-annual');
+      var fvExistingEl = root.querySelector('#zmc-fv-existing');
+      var gapEl = root.querySelector('#zmc-gap');
+      var lumpsumEl = root.querySelector('#zmc-lumpsum');
+      var annualReqEl = root.querySelector('#zmc-annual-req');
+      var monthlyReqEl = root.querySelector('#zmc-monthly-req');
+      var resetBtn = root.querySelector('#zmc-reset');
+
+      // start hidden
+      resultsCard.classList.add('hidden');
+
+      if (form) form.addEventListener('submit', function(e){
+        e.preventDefault();
+        [ageTodayEl, ageMarryEl, weddingCostEl, annualSavingsEl, existingSavingsEl, returnRateEl, inflationEl].forEach(function(el){ setError(el, false); });
+
+        var ageToday = getNumber(ageTodayEl);
+        var ageMarry = getNumber(ageMarryEl);
+        var weddingCostToday = getNumber(weddingCostEl);
+        var annualSavings = getNumber(annualSavingsEl);
+        var existingSavings = getNumber(existingSavingsEl);
+        var r = getNumber(returnRateEl) / 100;
+        var inf = getNumber(inflationEl) / 100;
+
+        var valid = true; var alerts = [];
+        if (!Number.isFinite(ageToday) || !within(ageToday, 1, 25)) { valid = false; setError(ageTodayEl, true); alerts.push('Age of child today must be between 1 and 25 years.'); }
+        if (!Number.isFinite(ageMarry) || !within(ageMarry, 18, 35)) { valid = false; setError(ageMarryEl, true); alerts.push('Marriage age must be between 18 and 35 years.'); }
+        if (Number.isFinite(ageToday) && Number.isFinite(ageMarry) && ageMarry <= ageToday) { valid = false; setError(ageMarryEl, true); alerts.push('Marriage age must be greater than the child\'s current age.'); }
+
+        if (!within(weddingCostToday, 0, 150000000)) { valid = false; setError(weddingCostEl, true); alerts.push('Wedding cost must be between 0 and 15,00,00,000 Rs.'); }
+        if (!within(annualSavings, 0, 1000000)) { valid = false; setError(annualSavingsEl, true); alerts.push('Annual savings must be between 0 and 10,00,000 Rs.'); }
+        if (!within(existingSavings, 0, 100000000)) { valid = false; setError(existingSavingsEl, true); alerts.push('Existing savings must be between 0 and 10,00,00,000 Rs.'); }
+
+        if (!Number.isFinite(r) || !within(r*100, 1, 25)) { valid = false; setError(returnRateEl, true); alerts.push('Expected rate of return must be between 1% and 25%.'); }
+        if (!Number.isFinite(inf) || !within(inf*100, 0, 15)) { valid = false; setError(inflationEl, true); alerts.push('Expected inflation rate must be between 0% and 15%.'); }
+
+        if (!valid) { alert(alerts.join('\n')); resultsCard.classList.add('hidden'); return; }
+
+        var years = ageMarry - ageToday;
+        var inflationFactor = Math.pow(1 + inf, years);
+        var returnFactor = Math.pow(1 + r, years);
+
+        var futureCost = weddingCostToday * inflationFactor;
+        var annuityFactor = (Math.pow(1 + r, years) - 1) / r; // ordinary annuity
+        var fvAnnualSavings = annualSavings * annuityFactor;
+        var fvExisting = existingSavings * returnFactor;
+        var gap = Math.max(0, futureCost - (fvAnnualSavings + fvExisting));
+
+        var oneTimeNow = gap / returnFactor;
+        var annualRequired = gap / annuityFactor;
+
+        var rm = r / 12; var months = years * 12; var monthlyFactor = (Math.pow(1 + rm, months) - 1) / rm; var monthlyRequired = gap / monthlyFactor;
+
+        futureCostEl.textContent = 'Rs. ' + Rs(futureCost);
+        fvAnnualEl.textContent = 'Rs. ' + Rs(fvAnnualSavings);
+        fvExistingEl.textContent = 'Rs. ' + Rs(fvExisting);
+        gapEl.textContent = 'Rs. ' + Rs(gap);
+
+        if (gap <= 0) { lumpsumEl.textContent = 'Rs. 0'; annualReqEl.textContent = 'Rs. 0'; monthlyReqEl.textContent = 'Rs. 0'; }
+        else { lumpsumEl.textContent = 'Rs. ' + Rs(oneTimeNow); annualReqEl.textContent = 'Rs. ' + Rs(annualRequired); monthlyReqEl.textContent = 'Rs. ' + Rs(monthlyRequired); }
+
+        resultsCard.classList.remove('hidden');
+      });
+
+      if (resetBtn) resetBtn.addEventListener('click', function(){
+        if (form) form.reset();
+        [ageTodayEl, ageMarryEl, weddingCostEl, annualSavingsEl, existingSavingsEl, returnRateEl, inflationEl].forEach(function(el){ setError(el, false); });
+        resultsCard.classList.add('hidden');
+        futureCostEl.textContent = '—'; fvAnnualEl.textContent = '—'; fvExistingEl.textContent = '—'; gapEl.textContent = '—'; lumpsumEl.textContent = '—'; annualReqEl.textContent = '—'; monthlyReqEl.textContent = '—';
+      });
+    })('zmc-child-marriage');
+  </script>
+</div>
