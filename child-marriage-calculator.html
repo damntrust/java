@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Child Marriage Calculator</title>
+  <style>
+    :root {
+      --blue-900: #0d47a1; /* dark blue */
+      --blue-700: #1565c0;
+      --blue-100: #e3f2fd;
+      --gray-100: #f7f8fa;
+      --gray-300: #dbe0e6;
+      --text-900: #0f172a;
+      --text-700: #334155;
+      --white: #ffffff;
+      --error: #c62828;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text-900);
+      background: var(--gray-100);
+    }
+
+    header {
+      background: var(--blue-900);
+      color: var(--white);
+      padding: 20px 16px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    header p {
+      margin: 6px 0 0 0;
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 24px auto 80px auto;
+      padding: 0 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--gray-300);
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--gray-300);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-header h2 {
+      margin: 0;
+      font-size: 16px;
+      color: var(--blue-900);
+      letter-spacing: 0.2px;
+    }
+
+    .card-body { padding: 16px; }
+
+    form .field {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 640px) {
+      form .field { grid-template-columns: 1fr; }
+    }
+
+    label { font-size: 14px; color: var(--text-700); }
+    .hint { font-size: 12px; color: var(--text-700); opacity: 0.8; margin-top: 4px; }
+
+    input[type="number"], input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      outline: none;
+      background: var(--white);
+      color: var(--text-900);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    input[type="number"]:focus, input[type="text"]:focus {
+      border-color: var(--blue-700);
+      box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.12);
+    }
+    .error {
+      border-color: var(--error) !important;
+      box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.12) !important;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--blue-900);
+      color: var(--white);
+    }
+    .btn-primary:hover { background: var(--blue-700); }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--blue-900);
+      border: 1px solid var(--blue-900);
+    }
+    .btn-secondary:hover {
+      background: var(--blue-100);
+      border-color: var(--blue-700);
+      color: var(--blue-700);
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 18px;
+    }
+    @media (max-width: 640px) {
+      .results-grid { grid-template-columns: 1fr; }
+    }
+
+    .result-item {
+      padding: 10px 12px;
+      border: 1px dashed var(--gray-300);
+      border-radius: 8px;
+      background: #fcfdff;
+    }
+    .result-label {
+      font-size: 12px;
+      color: var(--text-700);
+      margin-bottom: 4px;
+    }
+    .result-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--blue-900);
+    }
+
+    .muted { color: var(--text-700); opacity: 0.9; }
+    .note { font-size: 12px; color: var(--text-700); margin-top: 8px; }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Child Marriage Expense Calculator</h1>
+    <p>Plan for your child's wedding using inflation and returns.</p>
+  </header>
+
+  <div class="container">
+    <div class="grid">
+      <section class="card">
+        <div class="card-header">
+          <h2>Inputs</h2>
+        </div>
+        <div class="card-body">
+          <form id="calc-form" novalidate>
+            <div class="field">
+              <label for="age-today">1. What is age of your child today (Years)</label>
+              <div>
+                <input id="age-today" type="number" inputmode="numeric" min="1" max="25" step="1" placeholder="e.g. 10" required />
+                <div class="hint">Minimum 1, Maximum 25</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="age-marry">2. At what age will your child get married (Years)</label>
+              <div>
+                <input id="age-marry" type="number" inputmode="numeric" min="18" max="35" step="1" placeholder="e.g. 25" required />
+                <div class="hint">Minimum 18, Maximum 35</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="wedding-cost">3. Wedding cost at today's prices (Rs.)</label>
+              <div>
+                <input id="wedding-cost" type="text" inputmode="numeric" placeholder="e.g. 15,00,000" pattern="[0-9,\u00A0\s]*" />
+                <div class="hint">Minimum 0, Maximum 15,00,00,000</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="annual-savings">4. Your annual savings presently (Rs.)</label>
+              <div>
+                <input id="annual-savings" type="text" inputmode="numeric" placeholder="e.g. 25,000" pattern="[0-9,\u00A0\s]*" />
+                <div class="hint">Minimum 0, Maximum 10,00,000</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="existing-savings">5. Already saved for marriage (Rs.)</label>
+              <div>
+                <input id="existing-savings" type="text" inputmode="numeric" placeholder="e.g. 50,000" pattern="[0-9,\u00A0\s]*" />
+                <div class="hint">Minimum 0, Maximum 10,00,00,000</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="rate-return">6. Expected rate of return (%)</label>
+              <div>
+                <input id="rate-return" type="number" inputmode="decimal" min="1" max="25" step="0.01" placeholder="e.g. 12" required />
+                <div class="hint">Minimum 1%, Maximum 25%</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="inflation">7. Expected inflation rate (%)</label>
+              <div>
+                <input id="inflation" type="number" inputmode="decimal" min="0" max="15" step="0.01" placeholder="e.g. 10" required />
+                <div class="hint">Minimum 0%, Maximum 15%</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="btn-primary">Calculate</button>
+              <button type="button" id="reset-btn" class="btn-secondary">Reset</button>
+            </div>
+          </form>
+          <div class="note">Values are estimates for education only; not financial advice.</div>
+        </div>
+      </section>
+
+      <section class="card" id="results-card" aria-live="polite">
+        <div class="card-header">
+          <h2>Result</h2>
+        </div>
+        <div class="card-body">
+          <div class="results-grid">
+            <div class="result-item">
+              <div class="result-label">Inflation adjusted future cost of marriage of your child (Rs.)</div>
+              <div id="future-cost" class="result-value">—</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Future value of your annual savings (Rs.)</div>
+              <div id="fv-annual-savings" class="result-value">—</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Your existing savings will grow to (Rs.)</div>
+              <div id="fv-existing" class="result-value">—</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Additional funds required to meet wedding expenses (Rs.)</div>
+              <div id="gap" class="result-value">—</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">One time investment required (Rs.)</div>
+              <div id="lumpsum" class="result-value">—</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Annual investments required (Rs.)</div>
+              <div id="annual-required" class="result-value">—</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Monthly investments required (Rs.)</div>
+              <div id="monthly-required" class="result-value">—</div>
+            </div>
+          </div>
+          <div class="note">
+            * Depending on your convenience, you have the option of making either One time investment or Annual investments or Monthly investments
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const Rs = (n) => new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.round(n));
+
+      const sanitizeMoney = (val) => {
+        if (val == null) return 0;
+        // Remove commas, spaces, NBSP and non-digits
+        const clean = String(val).replace(/[\s,\u00A0]/g, '').replace(/[^0-9.]/g, '');
+        if (clean === '') return 0;
+        const num = Number(clean);
+        return Number.isFinite(num) ? num : 0;
+      };
+
+      const getNumber = (el) => {
+        if (el.type === 'text') return sanitizeMoney(el.value);
+        const v = Number(el.value);
+        return Number.isFinite(v) ? v : NaN;
+      };
+
+      const setError = (el, flag) => {
+        if (!el) return;
+        if (flag) el.classList.add('error');
+        else el.classList.remove('error');
+      };
+
+      const form = document.getElementById('calc-form');
+      const ageTodayEl = document.getElementById('age-today');
+      const ageMarryEl = document.getElementById('age-marry');
+      const weddingCostEl = document.getElementById('wedding-cost');
+      const annualSavingsEl = document.getElementById('annual-savings');
+      const existingSavingsEl = document.getElementById('existing-savings');
+      const returnRateEl = document.getElementById('rate-return');
+      const inflationEl = document.getElementById('inflation');
+
+      const resultsCard = document.getElementById('results-card');
+      const futureCostEl = document.getElementById('future-cost');
+      const fvAnnualEl = document.getElementById('fv-annual-savings');
+      const fvExistingEl = document.getElementById('fv-existing');
+      const gapEl = document.getElementById('gap');
+      const lumpsumEl = document.getElementById('lumpsum');
+      const annualReqEl = document.getElementById('annual-required');
+      const monthlyReqEl = document.getElementById('monthly-required');
+      const resetBtn = document.getElementById('reset-btn');
+
+      // Initialize hidden state
+      resultsCard.classList.add('hidden');
+
+      const within = (value, min, max) => value >= min && value <= max;
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Clear previous errors
+        [ageTodayEl, ageMarryEl, weddingCostEl, annualSavingsEl, existingSavingsEl, returnRateEl, inflationEl]
+          .forEach(el => setError(el, false));
+
+        // Read & validate
+        const ageToday = getNumber(ageTodayEl);
+        const ageMarry = getNumber(ageMarryEl);
+        const weddingCostToday = getNumber(weddingCostEl);
+        const annualSavings = getNumber(annualSavingsEl);
+        const existingSavings = getNumber(existingSavingsEl);
+        const r = getNumber(returnRateEl) / 100; // as decimal
+        const inf = getNumber(inflationEl) / 100; // as decimal
+
+        // Validation flags
+        let valid = true;
+        const alerts = [];
+
+        if (!Number.isFinite(ageToday) || !within(ageToday, 1, 25)) {
+          valid = false; setError(ageTodayEl, true);
+          alerts.push('Age of child today must be between 1 and 25 years.');
+        }
+        if (!Number.isFinite(ageMarry) || !within(ageMarry, 18, 35)) {
+          valid = false; setError(ageMarryEl, true);
+          alerts.push('Marriage age must be between 18 and 35 years.');
+        }
+        if (Number.isFinite(ageToday) && Number.isFinite(ageMarry) && ageMarry <= ageToday) {
+          valid = false; setError(ageMarryEl, true);
+          alerts.push('Marriage age must be greater than the child\'s current age.');
+        }
+
+        if (!within(weddingCostToday, 0, 150000000)) {
+          valid = false; setError(weddingCostEl, true);
+          alerts.push('Wedding cost must be between 0 and 15,00,00,000 Rs.');
+        }
+        if (!within(annualSavings, 0, 1000000)) {
+          valid = false; setError(annualSavingsEl, true);
+          alerts.push('Annual savings must be between 0 and 10,00,000 Rs.');
+        }
+        if (!within(existingSavings, 0, 100000000)) {
+          valid = false; setError(existingSavingsEl, true);
+          alerts.push('Existing savings must be between 0 and 10,00,00,000 Rs.');
+        }
+
+        if (!Number.isFinite(r) || !within(r * 100, 1, 25)) {
+          valid = false; setError(returnRateEl, true);
+          alerts.push('Expected rate of return must be between 1% and 25%.');
+        }
+        if (!Number.isFinite(inf) || !within(inf * 100, 0, 15)) {
+          valid = false; setError(inflationEl, true);
+          alerts.push('Expected inflation rate must be between 0% and 15%.');
+        }
+
+        if (!valid) {
+          alert(alerts.join('\n'));
+          resultsCard.classList.add('hidden');
+          return;
+        }
+
+        const years = ageMarry - ageToday;
+
+        // Calculations
+        const inflationFactor = Math.pow(1 + inf, years);
+        const returnFactor = Math.pow(1 + r, years);
+
+        const futureCost = weddingCostToday * inflationFactor;
+
+        // Future value of ordinary annuity (end of year contributions)
+        const annuityFactor = (Math.pow(1 + r, years) - 1) / r;
+        const fvAnnualSavings = annualSavings * annuityFactor;
+
+        const fvExisting = existingSavings * returnFactor;
+
+        const gap = Math.max(0, futureCost - (fvAnnualSavings + fvExisting));
+
+        // Required investments to cover the gap
+        const oneTimeNow = gap / returnFactor; // lump sum today
+        const annualRequired = gap / annuityFactor; // annual at year end
+
+        // Monthly requirement assuming monthly compounding at r/12 over years*12, ordinary annuity
+        const rm = r / 12;
+        const months = years * 12;
+        const monthlyFactor = (Math.pow(1 + rm, months) - 1) / rm;
+        const monthlyRequired = gap / monthlyFactor;
+
+        // Render
+        futureCostEl.textContent = `Rs. ${Rs(futureCost)}`;
+        fvAnnualEl.textContent = `Rs. ${Rs(fvAnnualSavings)}`;
+        fvExistingEl.textContent = `Rs. ${Rs(fvExisting)}`;
+        gapEl.textContent = `Rs. ${Rs(gap)}`;
+
+        if (gap <= 0) {
+          lumpsumEl.textContent = 'Rs. 0';
+          annualReqEl.textContent = 'Rs. 0';
+          monthlyReqEl.textContent = 'Rs. 0';
+        } else {
+          lumpsumEl.textContent = `Rs. ${Rs(oneTimeNow)}`;
+          annualReqEl.textContent = `Rs. ${Rs(annualRequired)}`;
+          monthlyReqEl.textContent = `Rs. ${Rs(monthlyRequired)}`;
+        }
+
+        resultsCard.classList.remove('hidden');
+      });
+
+      resetBtn.addEventListener('click', () => {
+        form.reset();
+        [ageTodayEl, ageMarryEl, weddingCostEl, annualSavingsEl, existingSavingsEl, returnRateEl, inflationEl]
+          .forEach(el => setError(el, false));
+        resultsCard.classList.add('hidden');
+        futureCostEl.textContent = '—';
+        fvAnnualEl.textContent = '—';
+        fvExistingEl.textContent = '—';
+        gapEl.textContent = '—';
+        lumpsumEl.textContent = '—';
+        annualReqEl.textContent = '—';
+        monthlyReqEl.textContent = '—';
+      });
+    })();
+  </script>
+</body>
+</html>
