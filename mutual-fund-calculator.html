@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mutual Fund Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .calculator-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .input-section {
+            padding: 40px;
+            background: #f8f9fa;
+        }
+
+        .result-section {
+            padding: 40px;
+            background: white;
+            border-left: 1px solid #e9ecef;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1e3c72;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .calculator-type {
+            display: flex;
+            background: #e9ecef;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 30px;
+        }
+
+        .calc-type-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #6c757d;
+        }
+
+        .calc-type-btn.active {
+            background: #2a5298;
+            color: white;
+            box-shadow: 0 2px 10px rgba(42, 82, 152, 0.3);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(42, 82, 152, 0.3);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid #2a5298;
+        }
+
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 15px;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2a5298;
+            margin-bottom: 10px;
+        }
+
+        .result-subtitle {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .breakdown {
+            margin-top: 30px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1e3c72;
+        }
+
+        .breakdown-label {
+            color: #6c757d;
+        }
+
+        .breakdown-value {
+            font-weight: 600;
+            color: #2a5298;
+        }
+
+        .chart-container {
+            margin-top: 30px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e3c72;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .chart-label {
+            width: 100px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .chart-fill {
+            flex: 1;
+            height: 20px;
+            background: linear-gradient(90deg, #2a5298, #1e3c72);
+            border-radius: 10px;
+            margin: 0 10px;
+            position: relative;
+        }
+
+        .chart-percentage {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2a5298;
+            width: 60px;
+            text-align: right;
+        }
+
+        .reset-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .calculator-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .input-section,
+            .result-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Mutual Fund Calculator</h1>
+            <p>Calculate your mutual fund returns and plan your investments</p>
+        </div>
+        
+        <div class="calculator-container">
+            <div class="input-section">
+                <div class="calculator-type">
+                    <button class="calc-type-btn active" data-type="lumpsum">Lump Sum</button>
+                    <button class="calc-type-btn" data-type="sip">SIP</button>
+                    <button class="calc-type-btn" data-type="goal">Goal Planning</button>
+                </div>
+
+                <!-- Lump Sum Calculator -->
+                <div id="lumpsum-calc" class="calculator-form">
+                    <div class="form-group">
+                        <label for="lumpsum-amount">Investment Amount (₹)</label>
+                        <input type="number" id="lumpsum-amount" placeholder="100000" min="1000" step="1000">
+                    </div>
+                    <div class="form-group">
+                        <label for="lumpsum-return">Expected Annual Return (%)</label>
+                        <input type="number" id="lumpsum-return" placeholder="12" min="1" max="30" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="lumpsum-period">Investment Period (Years)</label>
+                        <input type="number" id="lumpsum-period" placeholder="10" min="1" max="50" step="1">
+                    </div>
+                </div>
+
+                <!-- SIP Calculator -->
+                <div id="sip-calc" class="calculator-form hidden">
+                    <div class="form-group">
+                        <label for="sip-amount">Monthly SIP Amount (₹)</label>
+                        <input type="number" id="sip-amount" placeholder="5000" min="500" step="500">
+                    </div>
+                    <div class="form-group">
+                        <label for="sip-return">Expected Annual Return (%)</label>
+                        <input type="number" id="sip-return" placeholder="12" min="1" max="30" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="sip-period">Investment Period (Years)</label>
+                        <input type="number" id="sip-period" placeholder="10" min="1" max="50" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="sip-frequency">SIP Frequency</label>
+                        <select id="sip-frequency">
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Goal Planning Calculator -->
+                <div id="goal-calc" class="calculator-form hidden">
+                    <div class="form-group">
+                        <label for="goal-amount">Target Amount (₹)</label>
+                        <input type="number" id="goal-amount" placeholder="1000000" min="10000" step="10000">
+                    </div>
+                    <div class="form-group">
+                        <label for="goal-return">Expected Annual Return (%)</label>
+                        <input type="number" id="goal-return" placeholder="12" min="1" max="30" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="goal-period">Time Period (Years)</label>
+                        <input type="number" id="goal-period" placeholder="10" min="1" max="50" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="goal-initial">Initial Investment (₹)</label>
+                        <input type="number" id="goal-initial" placeholder="100000" min="0" step="1000">
+                    </div>
+                </div>
+
+                <button class="calculate-btn" onclick="calculateReturns()">Calculate Returns</button>
+                <button class="reset-btn" onclick="resetCalculator()">Reset</button>
+            </div>
+
+            <div class="result-section">
+                <div id="results" class="hidden">
+                    <div class="result-card">
+                        <div class="result-title">Total Investment</div>
+                        <div class="result-value" id="total-investment">₹0</div>
+                        <div class="result-subtitle">Amount you invested</div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="result-title">Maturity Value</div>
+                        <div class="result-value" id="maturity-value">₹0</div>
+                        <div class="result-subtitle">Value at maturity</div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="result-title">Total Returns</div>
+                        <div class="result-value" id="total-returns">₹0</div>
+                        <div class="result-subtitle">Profit earned</div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="result-title">Return Percentage</div>
+                        <div class="result-value" id="return-percentage">0%</div>
+                        <div class="result-subtitle">Overall return on investment</div>
+                    </div>
+
+                    <div class="breakdown">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Principal Amount</span>
+                            <span class="breakdown-value" id="breakdown-principal">₹0</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Interest Earned</span>
+                            <span class="breakdown-value" id="breakdown-interest">₹0</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Total Value</span>
+                            <span class="breakdown-value" id="breakdown-total">₹0</span>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="chart-title">Investment Breakdown</div>
+                        <div class="chart-bar">
+                            <span class="chart-label">Principal</span>
+                            <div class="chart-fill" id="principal-bar"></div>
+                            <span class="chart-percentage" id="principal-percentage">0%</span>
+                        </div>
+                        <div class="chart-bar">
+                            <span class="chart-label">Returns</span>
+                            <div class="chart-fill" id="returns-bar"></div>
+                            <span class="chart-percentage" id="returns-percentage">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="no-results" class="result-card">
+                    <div class="result-title">Welcome to Mutual Fund Calculator</div>
+                    <div class="result-subtitle">Enter your investment details and click "Calculate Returns" to see your projected returns</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCalculator = 'lumpsum';
+
+        // Calculator type switching
+        document.querySelectorAll('.calc-type-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('.calc-type-btn').forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Hide all calculator forms
+                document.querySelectorAll('.calculator-form').forEach(form => form.classList.add('hidden'));
+                
+                // Show selected calculator form
+                currentCalculator = this.dataset.type;
+                document.getElementById(currentCalculator + '-calc').classList.remove('hidden');
+                
+                // Hide results
+                document.getElementById('results').classList.add('hidden');
+                document.getElementById('no-results').classList.remove('hidden');
+            });
+        });
+
+        function calculateReturns() {
+            let result = {};
+            
+            if (currentCalculator === 'lumpsum') {
+                result = calculateLumpSum();
+            } else if (currentCalculator === 'sip') {
+                result = calculateSIP();
+            } else if (currentCalculator === 'goal') {
+                result = calculateGoal();
+            }
+            
+            if (result) {
+                displayResults(result);
+            }
+        }
+
+        function calculateLumpSum() {
+            const amount = parseFloat(document.getElementById('lumpsum-amount').value);
+            const returnRate = parseFloat(document.getElementById('lumpsum-return').value);
+            const period = parseFloat(document.getElementById('lumpsum-period').value);
+            
+            if (!amount || !returnRate || !period) {
+                alert('Please fill in all fields');
+                return null;
+            }
+            
+            const monthlyRate = returnRate / 100 / 12;
+            const totalMonths = period * 12;
+            const maturityValue = amount * Math.pow(1 + monthlyRate, totalMonths);
+            const totalReturns = maturityValue - amount;
+            const returnPercentage = (totalReturns / amount) * 100;
+            
+            return {
+                totalInvestment: amount,
+                maturityValue: maturityValue,
+                totalReturns: totalReturns,
+                returnPercentage: returnPercentage
+            };
+        }
+
+        function calculateSIP() {
+            const amount = parseFloat(document.getElementById('sip-amount').value);
+            const returnRate = parseFloat(document.getElementById('sip-return').value);
+            const period = parseFloat(document.getElementById('sip-period').value);
+            const frequency = document.getElementById('sip-frequency').value;
+            
+            if (!amount || !returnRate || !period) {
+                alert('Please fill in all fields');
+                return null;
+            }
+            
+            let totalInvestment, maturityValue;
+            
+            if (frequency === 'monthly') {
+                totalInvestment = amount * period * 12;
+                const monthlyRate = returnRate / 100 / 12;
+                const totalMonths = period * 12;
+                maturityValue = amount * (((Math.pow(1 + monthlyRate, totalMonths) - 1) / monthlyRate) * (1 + monthlyRate));
+            } else if (frequency === 'quarterly') {
+                totalInvestment = amount * period * 4;
+                const quarterlyRate = returnRate / 100 / 4;
+                const totalQuarters = period * 4;
+                maturityValue = amount * (((Math.pow(1 + quarterlyRate, totalQuarters) - 1) / quarterlyRate) * (1 + quarterlyRate));
+            } else { // yearly
+                totalInvestment = amount * period;
+                const yearlyRate = returnRate / 100;
+                maturityValue = amount * (((Math.pow(1 + yearlyRate, period) - 1) / yearlyRate) * (1 + yearlyRate));
+            }
+            
+            const totalReturns = maturityValue - totalInvestment;
+            const returnPercentage = (totalReturns / totalInvestment) * 100;
+            
+            return {
+                totalInvestment: totalInvestment,
+                maturityValue: maturityValue,
+                totalReturns: totalReturns,
+                returnPercentage: returnPercentage
+            };
+        }
+
+        function calculateGoal() {
+            const targetAmount = parseFloat(document.getElementById('goal-amount').value);
+            const returnRate = parseFloat(document.getElementById('goal-return').value);
+            const period = parseFloat(document.getElementById('goal-period').value);
+            const initialAmount = parseFloat(document.getElementById('goal-initial').value) || 0;
+            
+            if (!targetAmount || !returnRate || !period) {
+                alert('Please fill in all required fields');
+                return null;
+            }
+            
+            const monthlyRate = returnRate / 100 / 12;
+            const totalMonths = period * 12;
+            
+            // Calculate future value of initial investment
+            const futureValueOfInitial = initialAmount * Math.pow(1 + monthlyRate, totalMonths);
+            
+            // Calculate required monthly SIP
+            const remainingAmount = targetAmount - futureValueOfInitial;
+            const monthlySIP = remainingAmount / (((Math.pow(1 + monthlyRate, totalMonths) - 1) / monthlyRate) * (1 + monthlyRate));
+            
+            const totalInvestment = initialAmount + (monthlySIP * totalMonths);
+            const totalReturns = targetAmount - totalInvestment;
+            const returnPercentage = (totalReturns / totalInvestment) * 100;
+            
+            return {
+                totalInvestment: totalInvestment,
+                maturityValue: targetAmount,
+                totalReturns: totalReturns,
+                returnPercentage: returnPercentage,
+                monthlySIP: monthlySIP,
+                initialAmount: initialAmount
+            };
+        }
+
+        function displayResults(result) {
+            // Show results section
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('no-results').classList.add('hidden');
+            
+            // Update result values
+            document.getElementById('total-investment').textContent = formatCurrency(result.totalInvestment);
+            document.getElementById('maturity-value').textContent = formatCurrency(result.maturityValue);
+            document.getElementById('total-returns').textContent = formatCurrency(result.totalReturns);
+            document.getElementById('return-percentage').textContent = result.returnPercentage.toFixed(2) + '%';
+            
+            // Update breakdown
+            document.getElementById('breakdown-principal').textContent = formatCurrency(result.totalInvestment);
+            document.getElementById('breakdown-interest').textContent = formatCurrency(result.totalReturns);
+            document.getElementById('breakdown-total').textContent = formatCurrency(result.maturityValue);
+            
+            // Update chart
+            const principalPercentage = (result.totalInvestment / result.maturityValue) * 100;
+            const returnsPercentage = (result.totalReturns / result.maturityValue) * 100;
+            
+            document.getElementById('principal-percentage').textContent = principalPercentage.toFixed(1) + '%';
+            document.getElementById('returns-percentage').textContent = returnsPercentage.toFixed(1) + '%';
+            
+            // Update chart bars (simplified visual representation)
+            document.getElementById('principal-bar').style.width = principalPercentage + '%';
+            document.getElementById('returns-bar').style.width = returnsPercentage + '%';
+        }
+
+        function formatCurrency(amount) {
+            return '₹' + amount.toLocaleString('en-IN', {
+                maximumFractionDigits: 0,
+                minimumFractionDigits: 0
+            });
+        }
+
+        function resetCalculator() {
+            // Reset all input fields
+            document.querySelectorAll('input[type="number"]').forEach(input => {
+                input.value = '';
+            });
+            
+            // Reset to lumpsum calculator
+            document.querySelectorAll('.calc-type-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('[data-type="lumpsum"]').classList.add('active');
+            
+            document.querySelectorAll('.calculator-form').forEach(form => form.classList.add('hidden'));
+            document.getElementById('lumpsum-calc').classList.remove('hidden');
+            currentCalculator = 'lumpsum';
+            
+            // Hide results
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('no-results').classList.remove('hidden');
+        }
+
+        // Add input validation and real-time calculation
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', function() {
+                // Optional: Add real-time validation or calculation
+                if (this.value < 0) {
+                    this.value = 0;
+                }
+            });
+        });
+
+        // Initialize with default values for demo
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('lumpsum-amount').value = '100000';
+            document.getElementById('lumpsum-return').value = '12';
+            document.getElementById('lumpsum-period').value = '10';
+        });
+    </script>
+</body>
+</html>
