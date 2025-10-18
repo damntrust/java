@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mutual Fund Calculator</title>
+</head>
+<body style="margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);min-height:100vh;padding:20px;">
+    <div style="max-width:1200px;margin:0 auto;background:white;border-radius:15px;box-shadow:0 20px 40px rgba(0,0,0,0.1);overflow:hidden;">
+        <!-- Header -->
+        <div style="background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);color:white;padding:30px;text-align:center;">
+            <h1 style="font-size:2.5rem;margin-bottom:10px;font-weight:700;">Mutual Fund Calculator</h1>
+            <p style="font-size:1.1rem;opacity:0.9;">Calculate your mutual fund returns and plan your investments</p>
+        </div>
+        
+        <!-- Calculator Container -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:600px;">
+            <!-- Input Section -->
+            <div style="padding:40px;background:#f8f9fa;">
+                <!-- Calculator Type Selector -->
+                <div style="display:flex;background:#e9ecef;border-radius:10px;padding:5px;margin-bottom:30px;">
+                    <button id="lumpsum-btn" onclick="switchCalculator('lumpsum')" style="flex:1;padding:12px;border:none;background:#2a5298;color:white;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.3s ease;">Lump Sum</button>
+                    <button id="sip-btn" onclick="switchCalculator('sip')" style="flex:1;padding:12px;border:none;background:transparent;color:#6c757d;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.3s ease;">SIP</button>
+                    <button id="goal-btn" onclick="switchCalculator('goal')" style="flex:1;padding:12px;border:none;background:transparent;color:#6c757d;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.3s ease;">Goal Planning</button>
+                </div>
+
+                <!-- Lump Sum Calculator -->
+                <div id="lumpsum-calc" style="display:block;">
+                    <div style="margin-bottom:25px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:#1e3c72;font-size:1rem;">Investment Amount (₹)</label>
+                        <input type="number" id="lumpsum-amount" placeholder="100000" min="1000" step="1000" style="width:100%;padding:12px 15px;border:2px solid #e9ecef;border-radius:8px;font-size:1rem;transition:all 0.3s ease;background:white;">
+                    </div>
+                    <div style="margin-bottom:25px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:#1e3c72;font-size:1rem;">Expected Annual Return (%)</label>
+                        <input type="number" id="lumpsum-return" placeholder="12" min="1" max="30" step="0.1" style="width:100%;padding:12px 15px;border:2px solid #e9ecef;border-radius:8px;font-size:1rem;transition:all 0.3s ease;background:white;">
+                    </div>
+                    <div style="margin-bottom:25px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:#1e3c72;font-size:1rem;">Investment Period (Years)</label>
+                        <input type="number" id="lumpsum-period" placeholder="10" min="1" max="50" step="1" style="width:100%;padding:12px 15px;border:2px solid #e9ecef;border-radius:8px;font-size:1rem;transition:all 0.3s ease;background:white;">
+                    </div>
+                </div>
+
+                <!-- SIP Calculator -->
+                <div id="sip-calc" style="display:none;">
+                    <div style="margin-bottom:25px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:#1e3c72;font-size:1rem;">Monthly SIP Amount (₹)</label>
+                        <input type="number" id="sip-amount" placeholder="5000" min="500" step="500" style="width:100%;padding:12px 15px;border:2px solid #e9ecef;border-radius:8px;font-size:1rem;transition:all 0.3s ease;background:white;">
+                    </div>
+                    <div style="margin-bottom:25px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:#1e3c72;font-size:1rem;">Expected Annual Return (%)</label>
+                        <input type="number" id="sip-return" placeholder="12" min="1" max="30" step="0.1" style="width:100%;padding:12px 15px;border:2px solid #e9ecef;border-radius:8px;font-size:1rem;transition:all 0.3s ease;background:white;">
+                    </div>
+                    <div style="margin-bottom:25px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:#1e3c72;font-size:1rem;">Investment Period (Years)</label>
+                        <input type="number" id="sip-period" placeholder="10" min="1" max="50" step="1" style="width:100%;padding:12px 15px;border:2px solid #e9ecef;border-radius:8px;font-size:1rem;transition:all 0.3s ease;background:white;">
+                    </div>
+                    <div style="margin-bottom:25px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:#1e3c72;font-size:1rem;">SIP Frequency</label>
+                        <select id="sip-frequency" style="width:100%;padding:12px 15px;border:2px solid #e9ecef;border-radius:8px;font-size:1rem;transition:all 0.3s ease;background:white;">
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Goal Planning Calculator -->
+                <div id="goal-calc" style="display:none;">
+                    <div style="margin-bottom:25px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:#1e3c72;font-size:1rem;">Target Amount (₹)</label>
+                        <input type="number" id="goal-amount" placeholder="1000000" min="10000" step="10000" style="width:100%;padding:12px 15px;border:2px solid #e9ecef;border-radius:8px;font-size:1rem;transition:all 0.3s ease;background:white;">
+                    </div>
+                    <div style="margin-bottom:25px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:#1e3c72;font-size:1rem;">Expected Annual Return (%)</label>
+                        <input type="number" id="goal-return" placeholder="12" min="1" max="30" step="0.1" style="width:100%;padding:12px 15px;border:2px solid #e9ecef;border-radius:8px;font-size:1rem;transition:all 0.3s ease;background:white;">
+                    </div>
+                    <div style="margin-bottom:25px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:#1e3c72;font-size:1rem;">Time Period (Years)</label>
+                        <input type="number" id="goal-period" placeholder="10" min="1" max="50" step="1" style="width:100%;padding:12px 15px;border:2px solid #e9ecef;border-radius:8px;font-size:1rem;transition:all 0.3s ease;background:white;">
+                    </div>
+                    <div style="margin-bottom:25px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:#1e3c72;font-size:1rem;">Initial Investment (₹)</label>
+                        <input type="number" id="goal-initial" placeholder="100000" min="0" step="1000" style="width:100%;padding:12px 15px;border:2px solid #e9ecef;border-radius:8px;font-size:1rem;transition:all 0.3s ease;background:white;">
+                    </div>
+                </div>
+
+                <!-- Tax Options -->
+                <div style="margin-top:20px;padding:20px;background:#f8f9fa;border-radius:10px;border:1px solid #e9ecef;">
+                    <h3 style="color:#1e3c72;margin-bottom:15px;font-size:1.1rem;">Tax Considerations</h3>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                        <div id="ltcg-option" onclick="selectTaxOption('ltcg')" style="background:white;border:2px solid #2a5298;border-radius:8px;padding:15px;cursor:pointer;transition:all 0.3s ease;">
+                            <h4 style="color:#1e3c72;margin-bottom:5px;font-size:1rem;">LTCG (Long Term)</h4>
+                            <p style="color:#6c757d;font-size:0.85rem;">10% on gains above ₹1 lakh</p>
+                        </div>
+                        <div id="stcg-option" onclick="selectTaxOption('stcg')" style="background:white;border:2px solid #e9ecef;border-radius:8px;padding:15px;cursor:pointer;transition:all 0.3s ease;">
+                            <h4 style="color:#1e3c72;margin-bottom:5px;font-size:1rem;">STCG (Short Term)</h4>
+                            <p style="color:#6c757d;font-size:0.85rem;">As per income tax slab</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <button onclick="calculateReturns()" style="width:100%;padding:15px;background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);color:white;border:none;border-radius:10px;font-size:1.1rem;font-weight:600;cursor:pointer;transition:all 0.3s ease;margin-top:20px;">Calculate Returns</button>
+                <button onclick="resetCalculator()" style="background:#6c757d;color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:600;margin-top:15px;transition:all 0.3s ease;">Reset</button>
+            </div>
+
+            <!-- Result Section -->
+            <div style="padding:40px;background:white;border-left:1px solid #e9ecef;">
+                <div id="results" style="display:none;">
+                    <div style="background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);border-radius:15px;padding:25px;margin-bottom:20px;border-left:5px solid #2a5298;">
+                        <div style="font-size:1.2rem;font-weight:700;color:#1e3c72;margin-bottom:15px;">Total Investment</div>
+                        <div id="total-investment" style="font-size:2rem;font-weight:700;color:#2a5298;margin-bottom:10px;">₹0</div>
+                        <div style="color:#6c757d;font-size:0.9rem;">Amount you invested</div>
+                    </div>
+
+                    <div style="background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);border-radius:15px;padding:25px;margin-bottom:20px;border-left:5px solid #2a5298;">
+                        <div style="font-size:1.2rem;font-weight:700;color:#1e3c72;margin-bottom:15px;">Maturity Value</div>
+                        <div id="maturity-value" style="font-size:2rem;font-weight:700;color:#2a5298;margin-bottom:10px;">₹0</div>
+                        <div style="color:#6c757d;font-size:0.9rem;">Value at maturity</div>
+                    </div>
+
+                    <div style="background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);border-radius:15px;padding:25px;margin-bottom:20px;border-left:5px solid #2a5298;">
+                        <div style="font-size:1.2rem;font-weight:700;color:#1e3c72;margin-bottom:15px;">Total Returns</div>
+                        <div id="total-returns" style="font-size:2rem;font-weight:700;color:#2a5298;margin-bottom:10px;">₹0</div>
+                        <div style="color:#6c757d;font-size:0.9rem;">Profit earned</div>
+                    </div>
+
+                    <div style="background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);border-radius:15px;padding:25px;margin-bottom:20px;border-left:5px solid #2a5298;">
+                        <div style="font-size:1.2rem;font-weight:700;color:#1e3c72;margin-bottom:15px;">Return Percentage</div>
+                        <div id="return-percentage" style="font-size:2rem;font-weight:700;color:#2a5298;margin-bottom:10px;">0%</div>
+                        <div style="color:#6c757d;font-size:0.9rem;">Overall return on investment</div>
+                    </div>
+
+                    <!-- Breakdown -->
+                    <div style="margin-top:30px;">
+                        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e9ecef;">
+                            <span style="color:#6c757d;">Principal Amount</span>
+                            <span id="breakdown-principal" style="font-weight:600;color:#2a5298;">₹0</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e9ecef;">
+                            <span style="color:#6c757d;">Interest Earned</span>
+                            <span id="breakdown-interest" style="font-weight:600;color:#2a5298;">₹0</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e9ecef;">
+                            <span style="color:#6c757d;">Tax (if applicable)</span>
+                            <span id="breakdown-tax" style="font-weight:600;color:#2a5298;">₹0</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:10px 0;font-weight:700;font-size:1.1rem;color:#1e3c72;">
+                            <span>Net Value</span>
+                            <span id="breakdown-total" style="font-weight:600;color:#2a5298;">₹0</span>
+                        </div>
+                    </div>
+
+                    <!-- Chart -->
+                    <div style="margin-top:30px;background:white;border-radius:10px;padding:20px;box-shadow:0 5px 15px rgba(0,0,0,0.05);">
+                        <div style="font-size:1.1rem;font-weight:600;color:#1e3c72;margin-bottom:15px;text-align:center;">Investment Breakdown</div>
+                        <div style="display:flex;align-items:center;margin-bottom:15px;">
+                            <span style="width:100px;font-size:0.9rem;color:#6c757d;">Principal</span>
+                            <div style="flex:1;height:20px;background:linear-gradient(90deg,#2a5298,#1e3c72);border-radius:10px;margin:0 10px;position:relative;">
+                                <div id="principal-bar" style="height:100%;background:linear-gradient(90deg,#2a5298,#1e3c72);border-radius:10px;width:0%;"></div>
+                            </div>
+                            <span id="principal-percentage" style="font-size:0.9rem;font-weight:600;color:#2a5298;width:60px;text-align:right;">0%</span>
+                        </div>
+                        <div style="display:flex;align-items:center;margin-bottom:15px;">
+                            <span style="width:100px;font-size:0.9rem;color:#6c757d;">Returns</span>
+                            <div style="flex:1;height:20px;background:linear-gradient(90deg,#2a5298,#1e3c72);border-radius:10px;margin:0 10px;position:relative;">
+                                <div id="returns-bar" style="height:100%;background:linear-gradient(90deg,#2a5298,#1e3c72);border-radius:10px;width:0%;"></div>
+                            </div>
+                            <span id="returns-percentage" style="font-size:0.9rem;font-weight:600;color:#2a5298;width:60px;text-align:right;">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="no-results" style="background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);border-radius:15px;padding:25px;margin-bottom:20px;border-left:5px solid #2a5298;">
+                    <div style="font-size:1.2rem;font-weight:700;color:#1e3c72;margin-bottom:15px;">Welcome to Mutual Fund Calculator</div>
+                    <div style="color:#6c757d;font-size:0.9rem;">Enter your investment details and click "Calculate Returns" to see your projected returns</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCalculator = 'lumpsum';
+        let selectedTaxOption = 'ltcg';
+
+        function switchCalculator(type) {
+            currentCalculator = type;
+            
+            // Update button styles
+            document.getElementById('lumpsum-btn').style.background = type === 'lumpsum' ? '#2a5298' : 'transparent';
+            document.getElementById('lumpsum-btn').style.color = type === 'lumpsum' ? 'white' : '#6c757d';
+            document.getElementById('sip-btn').style.background = type === 'sip' ? '#2a5298' : 'transparent';
+            document.getElementById('sip-btn').style.color = type === 'sip' ? 'white' : '#6c757d';
+            document.getElementById('goal-btn').style.background = type === 'goal' ? '#2a5298' : 'transparent';
+            document.getElementById('goal-btn').style.color = type === 'goal' ? 'white' : '#6c757d';
+            
+            // Show/hide calculator forms
+            document.getElementById('lumpsum-calc').style.display = type === 'lumpsum' ? 'block' : 'none';
+            document.getElementById('sip-calc').style.display = type === 'sip' ? 'block' : 'none';
+            document.getElementById('goal-calc').style.display = type === 'goal' ? 'block' : 'none';
+            
+            // Hide results
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('no-results').style.display = 'block';
+        }
+
+        function selectTaxOption(option) {
+            selectedTaxOption = option;
+            
+            // Update visual selection
+            document.getElementById('ltcg-option').style.borderColor = option === 'ltcg' ? '#2a5298' : '#e9ecef';
+            document.getElementById('stcg-option').style.borderColor = option === 'stcg' ? '#2a5298' : '#e9ecef';
+        }
+
+        function calculateReturns() {
+            let result = {};
+            
+            if (currentCalculator === 'lumpsum') {
+                result = calculateLumpSum();
+            } else if (currentCalculator === 'sip') {
+                result = calculateSIP();
+            } else if (currentCalculator === 'goal') {
+                result = calculateGoal();
+            }
+            
+            if (result) {
+                result = applyTaxCalculations(result);
+                displayResults(result);
+            }
+        }
+
+        function calculateLumpSum() {
+            const amount = parseFloat(document.getElementById('lumpsum-amount').value);
+            const returnRate = parseFloat(document.getElementById('lumpsum-return').value);
+            const period = parseFloat(document.getElementById('lumpsum-period').value);
+            
+            if (!amount || !returnRate || !period) {
+                alert('Please fill in all fields');
+                return null;
+            }
+            
+            const monthlyRate = returnRate / 100 / 12;
+            const totalMonths = period * 12;
+            const maturityValue = amount * Math.pow(1 + monthlyRate, totalMonths);
+            const totalReturns = maturityValue - amount;
+            const returnPercentage = (totalReturns / amount) * 100;
+            
+            return {
+                totalInvestment: amount,
+                maturityValue: maturityValue,
+                totalReturns: totalReturns,
+                returnPercentage: returnPercentage,
+                period: period
+            };
+        }
+
+        function calculateSIP() {
+            const amount = parseFloat(document.getElementById('sip-amount').value);
+            const returnRate = parseFloat(document.getElementById('sip-return').value);
+            const period = parseFloat(document.getElementById('sip-period').value);
+            const frequency = document.getElementById('sip-frequency').value;
+            
+            if (!amount || !returnRate || !period) {
+                alert('Please fill in all fields');
+                return null;
+            }
+            
+            let totalInvestment, maturityValue;
+            
+            if (frequency === 'monthly') {
+                totalInvestment = amount * period * 12;
+                const monthlyRate = returnRate / 100 / 12;
+                const totalMonths = period * 12;
+                maturityValue = amount * (((Math.pow(1 + monthlyRate, totalMonths) - 1) / monthlyRate) * (1 + monthlyRate));
+            } else if (frequency === 'quarterly') {
+                totalInvestment = amount * period * 4;
+                const quarterlyRate = returnRate / 100 / 4;
+                const totalQuarters = period * 4;
+                maturityValue = amount * (((Math.pow(1 + quarterlyRate, totalQuarters) - 1) / quarterlyRate) * (1 + quarterlyRate));
+            } else { // yearly
+                totalInvestment = amount * period;
+                const yearlyRate = returnRate / 100;
+                maturityValue = amount * (((Math.pow(1 + yearlyRate, period) - 1) / yearlyRate) * (1 + yearlyRate));
+            }
+            
+            const totalReturns = maturityValue - totalInvestment;
+            const returnPercentage = (totalReturns / totalInvestment) * 100;
+            
+            return {
+                totalInvestment: totalInvestment,
+                maturityValue: maturityValue,
+                totalReturns: totalReturns,
+                returnPercentage: returnPercentage,
+                period: period
+            };
+        }
+
+        function calculateGoal() {
+            const targetAmount = parseFloat(document.getElementById('goal-amount').value);
+            const returnRate = parseFloat(document.getElementById('goal-return').value);
+            const period = parseFloat(document.getElementById('goal-period').value);
+            const initialAmount = parseFloat(document.getElementById('goal-initial').value) || 0;
+            
+            if (!targetAmount || !returnRate || !period) {
+                alert('Please fill in all required fields');
+                return null;
+            }
+            
+            const monthlyRate = returnRate / 100 / 12;
+            const totalMonths = period * 12;
+            
+            // Calculate future value of initial investment
+            const futureValueOfInitial = initialAmount * Math.pow(1 + monthlyRate, totalMonths);
+            
+            // Calculate required monthly SIP
+            const remainingAmount = targetAmount - futureValueOfInitial;
+            const monthlySIP = remainingAmount / (((Math.pow(1 + monthlyRate, totalMonths) - 1) / monthlyRate) * (1 + monthlyRate));
+            
+            const totalInvestment = initialAmount + (monthlySIP * totalMonths);
+            const totalReturns = targetAmount - totalInvestment;
+            const returnPercentage = (totalReturns / totalInvestment) * 100;
+            
+            return {
+                totalInvestment: totalInvestment,
+                maturityValue: targetAmount,
+                totalReturns: totalReturns,
+                returnPercentage: returnPercentage,
+                monthlySIP: monthlySIP,
+                initialAmount: initialAmount,
+                period: period
+            };
+        }
+
+        function applyTaxCalculations(result) {
+            let taxAmount = 0;
+            
+            if (selectedTaxOption === 'ltcg' && result.period >= 1) {
+                // LTCG: 10% on gains above ₹1 lakh
+                const taxableGains = Math.max(0, result.totalReturns - 100000);
+                taxAmount = taxableGains * 0.10;
+            } else if (selectedTaxOption === 'stcg' && result.period < 1) {
+                // STCG: Assume 20% for simplicity
+                taxAmount = result.totalReturns * 0.20;
+            }
+            
+            result.taxAmount = taxAmount;
+            result.netValue = result.maturityValue - taxAmount;
+            
+            return result;
+        }
+
+        function displayResults(result) {
+            // Show results section
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('no-results').style.display = 'none';
+            
+            // Update result values
+            document.getElementById('total-investment').textContent = formatCurrency(result.totalInvestment);
+            document.getElementById('maturity-value').textContent = formatCurrency(result.maturityValue);
+            document.getElementById('total-returns').textContent = formatCurrency(result.totalReturns);
+            document.getElementById('return-percentage').textContent = result.returnPercentage.toFixed(2) + '%';
+            
+            // Update breakdown
+            document.getElementById('breakdown-principal').textContent = formatCurrency(result.totalInvestment);
+            document.getElementById('breakdown-interest').textContent = formatCurrency(result.totalReturns);
+            document.getElementById('breakdown-tax').textContent = formatCurrency(result.taxAmount || 0);
+            document.getElementById('breakdown-total').textContent = formatCurrency(result.netValue || result.maturityValue);
+            
+            // Update chart
+            const principalPercentage = (result.totalInvestment / result.maturityValue) * 100;
+            const returnsPercentage = (result.totalReturns / result.maturityValue) * 100;
+            
+            document.getElementById('principal-percentage').textContent = principalPercentage.toFixed(1) + '%';
+            document.getElementById('returns-percentage').textContent = returnsPercentage.toFixed(1) + '%';
+            
+            // Update chart bars
+            document.getElementById('principal-bar').style.width = principalPercentage + '%';
+            document.getElementById('returns-bar').style.width = returnsPercentage + '%';
+        }
+
+        function formatCurrency(amount) {
+            return '₹' + amount.toLocaleString('en-IN', {
+                maximumFractionDigits: 0,
+                minimumFractionDigits: 0
+            });
+        }
+
+        function resetCalculator() {
+            // Reset all input fields
+            document.querySelectorAll('input[type="number"]').forEach(input => {
+                input.value = '';
+            });
+            
+            // Reset to lumpsum calculator
+            switchCalculator('lumpsum');
+            
+            // Reset tax option
+            selectTaxOption('ltcg');
+        }
+
+        // Initialize with default values
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('lumpsum-amount').value = '100000';
+            document.getElementById('lumpsum-return').value = '12';
+            document.getElementById('lumpsum-period').value = '10';
+        });
+    </script>
+</body>
+</html>
