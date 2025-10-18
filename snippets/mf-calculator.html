@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mutual Fund Calculator</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-subtle: #f5f7fb;
+      --text: #0b1b3a; /* deep navy */
+      --muted: #506186;
+      --primary: #0a3d91; /* dark blue accent */
+      --primary-600: #0a3a86;
+      --primary-700: #0a357a;
+      --ring: rgba(10, 61, 145, 0.25);
+      --border: #e4e8f1;
+      --danger: #c0392b;
+      --success: #1b7f4d;
+      --focus: 0 0 0 3px var(--ring);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+
+    .mf-wrap {
+      max-width: 980px;
+      margin: 24px auto;
+      padding: 16px;
+      background: var(--bg);
+    }
+
+    .mf-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(10, 20, 50, 0.06);
+      overflow: hidden;
+    }
+
+    .mf-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-subtle);
+    }
+
+    .mf-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* Tabs */
+    .mf-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .mf-tab {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .mf-tab:hover { color: var(--primary); border-color: var(--primary); }
+
+    .mf-tab[aria-selected="true"] {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(10, 61, 145, 0.25);
+    }
+
+    .mf-body {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 840px) {
+      .mf-body { grid-template-columns: 1fr; }
+    }
+
+    .mf-section-title {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+    }
+
+    .mf-field {
+      margin: 10px 0 14px;
+    }
+
+    .mf-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .mf-label { font-size: 14px; color: var(--text); font-weight: 600; }
+    .mf-hint { font-size: 12px; color: var(--muted); }
+
+    .mf-input {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .mf-input input, .mf-input select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .mf-input input:focus, .mf-input select:focus { border-color: var(--primary); box-shadow: var(--focus); }
+
+    .mf-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .mf-actions {
+      display: flex;
+      gap: 12px;
+      padding-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      appearance: none;
+      border-radius: 10px;
+      border: 1px solid var(--primary);
+      background: var(--primary);
+      color: #fff;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.06s ease, background 0.18s ease;
+    }
+
+    .btn:hover { background: var(--primary-600); }
+    .btn:active { transform: translateY(1px); }
+    .btn.secondary { background: #fff; color: var(--primary); }
+    .btn.ghost { background: transparent; border-color: var(--border); color: var(--muted); }
+
+    .mf-outputs {
+      background: var(--bg-subtle);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .mf-kpi {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    @media (max-width: 420px) { .mf-kpi { grid-template-columns: 1fr; } }
+
+    .kpi {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .kpi .name { font-size: 12px; color: var(--muted); }
+    .kpi .value { font-size: 18px; font-weight: 800; color: var(--text); margin-top: 4px; }
+
+    .mf-chart {
+      margin-top: 12px;
+      height: 10px;
+      background: #eef2fb;
+      border-radius: 999px;
+      overflow: hidden;
+      display: flex;
+    }
+    .bar-contrib { background: var(--primary); }
+    .bar-returns { background: #1f8b4c; }
+
+    .mf-note { margin-top: 8px; font-size: 12px; color: var(--muted); }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 1px, 1px); white-space: nowrap; border: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="mf-wrap" id="mf-calculator">
+    <div class="mf-card">
+      <div class="mf-header" role="banner">
+        <h2 class="mf-title">Mutual Fund Calculator</h2>
+      </div>
+
+      <div class="mf-tabs" role="tablist" aria-label="Calculator Types">
+        <button class="mf-tab" role="tab" aria-selected="true" aria-controls="tab-sip" id="tabbtn-sip">SIP</button>
+        <button class="mf-tab" role="tab" aria-selected="false" aria-controls="tab-lumpsum" id="tabbtn-lumpsum">Lumpsum</button>
+        <button class="mf-tab" role="tab" aria-selected="false" aria-controls="tab-stepup" id="tabbtn-stepup">Step-up SIP</button>
+        <button class="mf-tab" role="tab" aria-selected="false" aria-controls="tab-goal" id="tabbtn-goal">Goal</button>
+        <button class="mf-tab" role="tab" aria-selected="false" aria-controls="tab-swp" id="tabbtn-swp">SWP</button>
+        <button class="mf-tab" role="tab" aria-selected="false" aria-controls="tab-stp" id="tabbtn-stp">STP</button>
+        <button class="mf-tab" role="tab" aria-selected="false" aria-controls="tab-delay" id="tabbtn-delay">Delay Cost</button>
+      </div>
+
+      <div class="mf-body">
+        <div id="tab-sip" role="tabpanel" aria-labelledby="tabbtn-sip">
+          <h3 class="mf-section-title">SIP Inputs</h3>
+          <div class="mf-field">
+            <div class="mf-label-row">
+              <label class="mf-label" for="sip-amount">Monthly investment (₹)</label>
+              <div class="mf-hint">1,000 – 10,00,000</div>
+            </div>
+            <div class="mf-input"><input id="sip-amount" type="number" min="1000" max="1000000" step="500" value="10000"></div>
+          </div>
+          <div class="mf-row">
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="sip-years">Time period (years)</label>
+                <div class="mf-hint">1 – 50</div>
+              </div>
+              <div class="mf-input"><input id="sip-years" type="number" min="1" max="50" step="1" value="10"></div>
+            </div>
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="sip-rate">Expected return p.a. (%)</label>
+                <div class="mf-hint">4 – 24</div>
+              </div>
+              <div class="mf-input"><input id="sip-rate" type="number" min="4" max="24" step="0.1" value="12"></div>
+            </div>
+          </div>
+          <div class="mf-actions">
+            <button class="btn" data-action="calc-sip">Calculate</button>
+            <button class="btn secondary" data-action="reset-sip">Reset</button>
+          </div>
+        </div>
+
+        <div id="tab-lumpsum" role="tabpanel" aria-labelledby="tabbtn-lumpsum" hidden>
+          <h3 class="mf-section-title">Lumpsum Inputs</h3>
+          <div class="mf-field">
+            <div class="mf-label-row">
+              <label class="mf-label" for="lump-amount">Investment amount (₹)</label>
+              <div class="mf-hint">5,000 – 5,00,00,000</div>
+            </div>
+            <div class="mf-input"><input id="lump-amount" type="number" min="5000" max="50000000" step="1000" value="500000"></div>
+          </div>
+          <div class="mf-row">
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="lump-years">Time period (years)</label>
+                <div class="mf-hint">1 – 50</div>
+              </div>
+              <div class="mf-input"><input id="lump-years" type="number" min="1" max="50" step="1" value="10"></div>
+            </div>
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="lump-rate">Expected return p.a. (%)</label>
+                <div class="mf-hint">4 – 24</div>
+              </div>
+              <div class="mf-input"><input id="lump-rate" type="number" min="4" max="24" step="0.1" value="12"></div>
+            </div>
+          </div>
+          <div class="mf-actions">
+            <button class="btn" data-action="calc-lumpsum">Calculate</button>
+            <button class="btn secondary" data-action="reset-lumpsum">Reset</button>
+          </div>
+        </div>
+
+        <div id="tab-stepup" role="tabpanel" aria-labelledby="tabbtn-stepup" hidden>
+          <h3 class="mf-section-title">Step-up SIP Inputs</h3>
+          <div class="mf-row">
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="step-amount">Starting SIP (₹)</label>
+                <div class="mf-hint">1,000 – 10,00,000</div>
+              </div>
+              <div class="mf-input"><input id="step-amount" type="number" min="1000" max="1000000" step="500" value="10000"></div>
+            </div>
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="step-percent">Annual step-up (%)</label>
+                <div class="mf-hint">0 – 50</div>
+              </div>
+              <div class="mf-input"><input id="step-percent" type="number" min="0" max="50" step="1" value="10"></div>
+            </div>
+          </div>
+          <div class="mf-row">
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="step-years">Time period (years)</label>
+                <div class="mf-hint">1 – 50</div>
+              </div>
+              <div class="mf-input"><input id="step-years" type="number" min="1" max="50" step="1" value="10"></div>
+            </div>
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="step-rate">Expected return p.a. (%)</label>
+                <div class="mf-hint">4 – 24</div>
+              </div>
+              <div class="mf-input"><input id="step-rate" type="number" min="4" max="24" step="0.1" value="12"></div>
+            </div>
+          </div>
+          <div class="mf-actions">
+            <button class="btn" data-action="calc-stepup">Calculate</button>
+            <button class="btn secondary" data-action="reset-stepup">Reset</button>
+          </div>
+        </div>
+
+        <div id="tab-goal" role="tabpanel" aria-labelledby="tabbtn-goal" hidden>
+          <h3 class="mf-section-title">Goal Planning Inputs</h3>
+          <div class="mf-row">
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="goal-amount">Target amount (₹)</label>
+                <div class="mf-hint">50,000 – 50 Cr</div>
+              </div>
+              <div class="mf-input"><input id="goal-amount" type="number" min="50000" step="1000" value="10000000"></div>
+            </div>
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="goal-years">Time period (years)</label>
+                <div class="mf-hint">1 – 50</div>
+              </div>
+              <div class="mf-input"><input id="goal-years" type="number" min="1" max="50" step="1" value="10"></div>
+            </div>
+          </div>
+          <div class="mf-row">
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="goal-rate">Expected return p.a. (%)</label>
+                <div class="mf-hint">4 – 24</div>
+              </div>
+              <div class="mf-input"><input id="goal-rate" type="number" min="4" max="24" step="0.1" value="12"></div>
+            </div>
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="goal-mode">Invest via</label>
+                <div class="mf-hint">SIP or Lumpsum</div>
+              </div>
+              <div class="mf-input">
+                <select id="goal-mode">
+                  <option value="sip">Monthly SIP needed</option>
+                  <option value="lumpsum">One-time Lumpsum needed</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="mf-actions">
+            <button class="btn" data-action="calc-goal">Calculate</button>
+            <button class="btn secondary" data-action="reset-goal">Reset</button>
+          </div>
+        </div>
+
+        <div id="tab-swp" role="tabpanel" aria-labelledby="tabbtn-swp" hidden>
+          <h3 class="mf-section-title">SWP Inputs</h3>
+          <div class="mf-row">
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="swp-corpus">Starting corpus (₹)</label>
+                <div class="mf-hint">1,00,000 – 10 Cr</div>
+              </div>
+              <div class="mf-input"><input id="swp-corpus" type="number" min="100000" step="1000" value="2000000"></div>
+            </div>
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="swp-withdrawal">Monthly withdrawal (₹)</label>
+                <div class="mf-hint">5,000 – 10,00,000</div>
+              </div>
+              <div class="mf-input"><input id="swp-withdrawal" type="number" min="5000" step="500" value="30000"></div>
+            </div>
+          </div>
+          <div class="mf-row">
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="swp-years">Time period (years)</label>
+                <div class="mf-hint">1 – 50</div>
+              </div>
+              <div class="mf-input"><input id="swp-years" type="number" min="1" max="50" step="1" value="15"></div>
+            </div>
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="swp-rate">Expected return p.a. (%)</label>
+                <div class="mf-hint">4 – 18</div>
+              </div>
+              <div class="mf-input"><input id="swp-rate" type="number" min="4" max="18" step="0.1" value="10"></div>
+            </div>
+          </div>
+          <div class="mf-actions">
+            <button class="btn" data-action="calc-swp">Calculate</button>
+            <button class="btn secondary" data-action="reset-swp">Reset</button>
+          </div>
+        </div>
+
+        <div id="tab-stp" role="tabpanel" aria-labelledby="tabbtn-stp" hidden>
+          <h3 class="mf-section-title">STP Inputs</h3>
+          <div class="mf-row">
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="stp-source">Source corpus (₹)</label>
+                <div class="mf-hint">1,00,000 – 10 Cr</div>
+              </div>
+              <div class="mf-input"><input id="stp-source" type="number" min="100000" step="1000" value="500000"></div>
+            </div>
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="stp-transfer">Monthly transfer (₹)</label>
+                <div class="mf-hint">5,000 – 10,00,000</div>
+              </div>
+              <div class="mf-input"><input id="stp-transfer" type="number" min="5000" step="500" value="25000"></div>
+            </div>
+          </div>
+          <div class="mf-row">
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="stp-years">Time period (years)</label>
+                <div class="mf-hint">1 – 50</div>
+              </div>
+              <div class="mf-input"><input id="stp-years" type="number" min="1" max="50" step="1" value="5"></div>
+            </div>
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="stp-source-rate">Source return p.a. (%)</label>
+                <div class="mf-hint">3 – 8 (liquid fund)</div>
+              </div>
+              <div class="mf-input"><input id="stp-source-rate" type="number" min="0" max="12" step="0.1" value="4"></div>
+            </div>
+          </div>
+          <div class="mf-row">
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="stp-target-rate">Target return p.a. (%)</label>
+                <div class="mf-hint">8 – 20 (equity)</div>
+              </div>
+              <div class="mf-input"><input id="stp-target-rate" type="number" min="4" max="24" step="0.1" value="12"></div>
+            </div>
+          </div>
+          <div class="mf-actions">
+            <button class="btn" data-action="calc-stp">Calculate</button>
+            <button class="btn secondary" data-action="reset-stp">Reset</button>
+          </div>
+        </div>
+
+        <div id="tab-delay" role="tabpanel" aria-labelledby="tabbtn-delay" hidden>
+          <h3 class="mf-section-title">Cost of Delay Inputs</h3>
+          <div class="mf-row">
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="delay-amount">Monthly SIP (₹)</label>
+                <div class="mf-hint">1,000 – 10,00,000</div>
+              </div>
+              <div class="mf-input"><input id="delay-amount" type="number" min="1000" max="1000000" step="500" value="10000"></div>
+            </div>
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="delay-years">Total horizon (years)</label>
+                <div class="mf-hint">1 – 50</div>
+              </div>
+              <div class="mf-input"><input id="delay-years" type="number" min="1" max="50" step="1" value="20"></div>
+            </div>
+          </div>
+          <div class="mf-row">
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="delay-rate">Expected return p.a. (%)</label>
+                <div class="mf-hint">4 – 24</div>
+              </div>
+              <div class="mf-input"><input id="delay-rate" type="number" min="4" max="24" step="0.1" value="12"></div>
+            </div>
+            <div class="mf-field">
+              <div class="mf-label-row">
+                <label class="mf-label" for="delay-wait">Delay start by (months)</label>
+                <div class="mf-hint">1 – 60</div>
+              </div>
+              <div class="mf-input"><input id="delay-wait" type="number" min="1" max="120" step="1" value="12"></div>
+            </div>
+          </div>
+          <div class="mf-actions">
+            <button class="btn" data-action="calc-delay">Calculate</button>
+            <button class="btn secondary" data-action="reset-delay">Reset</button>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="mf-section-title">Results</h3>
+          <div class="mf-outputs">
+            <div class="mf-kpi">
+              <div class="kpi"><div class="name">Total Invested</div><div class="value" id="out-invested">₹0</div></div>
+              <div class="kpi"><div class="name">Future Value</div><div class="value" id="out-fv">₹0</div></div>
+              <div class="kpi"><div class="name">Wealth Gain</div><div class="value" id="out-gain">₹0</div></div>
+              <div class="kpi"><div class="name">Effective CAGR</div><div class="value" id="out-cagr">0%</div></div>
+            </div>
+            <div class="mf-chart" aria-hidden="true">
+              <div class="bar-contrib" id="bar-contrib" style="width:50%"></div>
+              <div class="bar-returns" id="bar-returns" style="width:50%"></div>
+            </div>
+            <div class="mf-note">All figures are estimates for illustration only. No API calls are used.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // Utilities
+      const clamp = (val, min, max) => Math.min(Math.max(Number(val || 0), min), max);
+      const toRateMonthly = (annualPct) => (Number(annualPct) / 100) / 12;
+      const toRateAnnual = (annualPct) => Number(annualPct) / 100;
+      const monthsFromYears = (years) => Math.round(Number(years) * 12);
+
+      const fmtINR = (num) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Number(num || 0));
+      const fmtPct = (num) => `${(Number(num || 0)).toFixed(2)}%`;
+
+      function updateBars(invested, fv) {
+        const gain = Math.max(fv - invested, 0);
+        const total = Math.max(fv, 1);
+        const contribPct = (invested / total) * 100;
+        const gainPct = (gain / total) * 100;
+        document.getElementById('bar-contrib').style.width = `${contribPct}%`;
+        document.getElementById('bar-returns').style.width = `${gainPct}%`;
+      }
+
+      function setOutputs(invested, fv, years) {
+        invested = Math.max(invested, 0);
+        fv = Math.max(fv, 0);
+        const gain = Math.max(fv - invested, 0);
+        const cagr = years > 0 && invested > 0 && fv > 0 ? (Math.pow(fv / invested, 1 / years) - 1) * 100 : 0;
+        document.getElementById('out-invested').textContent = fmtINR(invested);
+        document.getElementById('out-fv').textContent = fmtINR(fv);
+        document.getElementById('out-gain').textContent = fmtINR(gain);
+        document.getElementById('out-cagr').textContent = fmtPct(cagr);
+        updateBars(invested, fv);
+      }
+
+      // Calculations
+      function calcSipFV(monthly, years, annualPct) {
+        const n = monthsFromYears(years);
+        const i = toRateMonthly(annualPct);
+        if (i === 0) return monthly * n;
+        return monthly * ((Math.pow(1 + i, n) - 1) * (1 + i) / i);
+      }
+
+      function calcLumpsumFV(principal, years, annualPct) {
+        const r = toRateAnnual(annualPct);
+        return principal * Math.pow(1 + r, years);
+      }
+
+      function calcStepUpSipFV(startMonthly, stepUpPct, years, annualPct) {
+        const months = monthsFromYears(years);
+        const monthlyRate = toRateMonthly(annualPct);
+        const yearlyStep = 1 + (Number(stepUpPct) / 100);
+        let fv = 0;
+        let invested = 0;
+        let currentMonthly = Number(startMonthly);
+        for (let m = 1; m <= months; m++) {
+          fv = (fv + currentMonthly) * (1 + monthlyRate);
+          invested += currentMonthly;
+          if (m % 12 === 0) {
+            currentMonthly *= yearlyStep;
+          }
+        }
+        return { fv, invested };
+      }
+
+      function calcGoalSip(target, years, annualPct) {
+        const n = monthsFromYears(years);
+        const i = toRateMonthly(annualPct);
+        if (i === 0) return target / n;
+        return target * i / ((Math.pow(1 + i, n) - 1) * (1 + i));
+      }
+
+      function calcGoalLumpsum(target, years, annualPct) {
+        const r = toRateAnnual(annualPct);
+        return target / Math.pow(1 + r, years);
+      }
+
+      function calcSwp(principal, monthlyWithdrawal, years, annualPct) {
+        // Future value after systematic withdrawals; we simulate month-wise conservatively
+        const months = monthsFromYears(years);
+        const i = toRateMonthly(annualPct);
+        let balance = Number(principal);
+        let totalWithdrawn = 0;
+        for (let m = 1; m <= months; m++) {
+          balance = balance * (1 + i) - monthlyWithdrawal;
+          if (balance < 0) { totalWithdrawn += (monthlyWithdrawal + balance); balance = 0; break; }
+          totalWithdrawn += monthlyWithdrawal;
+        }
+        return { balance, totalWithdrawn };
+      }
+
+      function calcStp(sourceCorpus, monthlyTransfer, years, sourceAnnualPct, targetAnnualPct) {
+        const months = monthsFromYears(years);
+        const srcRate = toRateMonthly(sourceAnnualPct);
+        const tgtRate = toRateMonthly(targetAnnualPct);
+        let srcBal = Number(sourceCorpus);
+        let tgtBal = 0;
+        let totalTransferred = 0;
+        for (let m = 1; m <= months; m++) {
+          // source grows, then transfer
+          srcBal = srcBal * (1 + srcRate);
+          const transfer = Math.min(monthlyTransfer, srcBal);
+          srcBal -= transfer;
+          totalTransferred += transfer;
+          // target gets transfer then grows
+          tgtBal = (tgtBal + transfer) * (1 + tgtRate);
+        }
+        return { srcBal, tgtBal, totalTransferred };
+      }
+
+      function calcDelayCost(monthly, years, annualPct, delayMonths) {
+        const n = monthsFromYears(years);
+        const i = toRateMonthly(annualPct);
+        const fvNow = calcSipFV(monthly, years, annualPct);
+        const effectiveYears = Math.max((n - delayMonths), 0) / 12;
+        const fvDelayed = calcSipFV(monthly, effectiveYears, annualPct);
+        return { fvNow, fvDelayed, cost: fvNow - fvDelayed };
+      }
+
+      // Tab handling
+      const tabs = Array.from(document.querySelectorAll('.mf-tab'));
+      const panels = {
+        sip: document.getElementById('tab-sip'),
+        lumpsum: document.getElementById('tab-lumpsum'),
+        stepup: document.getElementById('tab-stepup'),
+        goal: document.getElementById('tab-goal'),
+        swp: document.getElementById('tab-swp'),
+        stp: document.getElementById('tab-stp'),
+        delay: document.getElementById('tab-delay')
+      };
+
+      tabs.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.id.replace('tabbtn-', '');
+          tabs.forEach(b => b.setAttribute('aria-selected', String(b === btn)));
+          Object.keys(panels).forEach(key => { panels[key].hidden = (key !== id); });
+          // clear outputs when switching
+          setOutputs(0, 0, 0);
+        });
+      });
+
+      // Action handlers
+      const root = document.getElementById('mf-calculator');
+      root.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const action = btn.getAttribute('data-action');
+        if (!action) return;
+        e.preventDefault();
+        try {
+          switch (action) {
+            case 'calc-sip': {
+              const amt = clamp(document.getElementById('sip-amount').value, 1000, 1000000);
+              const yrs = clamp(document.getElementById('sip-years').value, 1, 50);
+              const rate = clamp(document.getElementById('sip-rate').value, 0, 50);
+              const fv = calcSipFV(amt, yrs, rate);
+              const invested = amt * monthsFromYears(yrs);
+              setOutputs(invested, fv, yrs);
+              break;
+            }
+            case 'reset-sip': {
+              document.getElementById('sip-amount').value = 10000;
+              document.getElementById('sip-years').value = 10;
+              document.getElementById('sip-rate').value = 12;
+              setOutputs(0, 0, 0);
+              break;
+            }
+            case 'calc-lumpsum': {
+              const amt = clamp(document.getElementById('lump-amount').value, 5000, 50000000);
+              const yrs = clamp(document.getElementById('lump-years').value, 1, 50);
+              const rate = clamp(document.getElementById('lump-rate').value, 0, 50);
+              const fv = calcLumpsumFV(amt, yrs, rate);
+              setOutputs(amt, fv, yrs);
+              break;
+            }
+            case 'reset-lumpsum': {
+              document.getElementById('lump-amount').value = 500000;
+              document.getElementById('lump-years').value = 10;
+              document.getElementById('lump-rate').value = 12;
+              setOutputs(0, 0, 0);
+              break;
+            }
+            case 'calc-stepup': {
+              const start = clamp(document.getElementById('step-amount').value, 1000, 1000000);
+              const stepPct = clamp(document.getElementById('step-percent').value, 0, 50);
+              const yrs = clamp(document.getElementById('step-years').value, 1, 50);
+              const rate = clamp(document.getElementById('step-rate').value, 0, 50);
+              const { fv, invested } = calcStepUpSipFV(start, stepPct, yrs, rate);
+              setOutputs(invested, fv, yrs);
+              break;
+            }
+            case 'reset-stepup': {
+              document.getElementById('step-amount').value = 10000;
+              document.getElementById('step-percent').value = 10;
+              document.getElementById('step-years').value = 10;
+              document.getElementById('step-rate').value = 12;
+              setOutputs(0, 0, 0);
+              break;
+            }
+            case 'calc-goal': {
+              const target = Math.max(Number(document.getElementById('goal-amount').value || 0), 0);
+              const yrs = clamp(document.getElementById('goal-years').value, 1, 50);
+              const rate = clamp(document.getElementById('goal-rate').value, 0, 50);
+              const mode = document.getElementById('goal-mode').value;
+              if (mode === 'sip') {
+                const monthly = calcGoalSip(target, yrs, rate);
+                setOutputs(0, target, yrs);
+                document.getElementById('out-invested').textContent = 'Monthly SIP: ' + fmtINR(monthly);
+              } else {
+                const lumpsum = calcGoalLumpsum(target, yrs, rate);
+                setOutputs(0, target, yrs);
+                document.getElementById('out-invested').textContent = 'Lumpsum Needed: ' + fmtINR(lumpsum);
+              }
+              break;
+            }
+            case 'reset-goal': {
+              document.getElementById('goal-amount').value = 10000000;
+              document.getElementById('goal-years').value = 10;
+              document.getElementById('goal-rate').value = 12;
+              document.getElementById('goal-mode').value = 'sip';
+              setOutputs(0, 0, 0);
+              break;
+            }
+            case 'calc-swp': {
+              const corpus = Math.max(Number(document.getElementById('swp-corpus').value || 0), 0);
+              const wd = Math.max(Number(document.getElementById('swp-withdrawal').value || 0), 0);
+              const yrs = clamp(document.getElementById('swp-years').value, 1, 50);
+              const rate = clamp(document.getElementById('swp-rate').value, 0, 50);
+              const { balance, totalWithdrawn } = calcSwp(corpus, wd, yrs, rate);
+              setOutputs(totalWithdrawn, balance, yrs);
+              break;
+            }
+            case 'reset-swp': {
+              document.getElementById('swp-corpus').value = 2000000;
+              document.getElementById('swp-withdrawal').value = 30000;
+              document.getElementById('swp-years').value = 15;
+              document.getElementById('swp-rate').value = 10;
+              setOutputs(0, 0, 0);
+              break;
+            }
+            case 'calc-stp': {
+              const source = Math.max(Number(document.getElementById('stp-source').value || 0), 0);
+              const transfer = Math.max(Number(document.getElementById('stp-transfer').value || 0), 0);
+              const yrs = clamp(document.getElementById('stp-years').value, 1, 50);
+              const srcRate = clamp(document.getElementById('stp-source-rate').value, 0, 50);
+              const tgtRate = clamp(document.getElementById('stp-target-rate').value, 0, 50);
+              const { srcBal, tgtBal, totalTransferred } = calcStp(source, transfer, yrs, srcRate, tgtRate);
+              setOutputs(totalTransferred, tgtBal, yrs);
+              break;
+            }
+            case 'reset-stp': {
+              document.getElementById('stp-source').value = 500000;
+              document.getElementById('stp-transfer').value = 25000;
+              document.getElementById('stp-years').value = 5;
+              document.getElementById('stp-source-rate').value = 4;
+              document.getElementById('stp-target-rate').value = 12;
+              setOutputs(0, 0, 0);
+              break;
+            }
+            case 'calc-delay': {
+              const monthly = clamp(document.getElementById('delay-amount').value, 1000, 1000000);
+              const yrs = clamp(document.getElementById('delay-years').value, 1, 50);
+              const rate = clamp(document.getElementById('delay-rate').value, 0, 50);
+              const wait = clamp(document.getElementById('delay-wait').value, 1, 120);
+              const { fvNow, fvDelayed, cost } = calcDelayCost(monthly, yrs, rate, wait);
+              setOutputs(monthly * monthsFromYears(yrs), fvNow, yrs);
+              document.getElementById('out-cagr').textContent = 'Delay Cost: ' + fmtINR(cost);
+              break;
+            }
+            case 'reset-delay': {
+              document.getElementById('delay-amount').value = 10000;
+              document.getElementById('delay-years').value = 20;
+              document.getElementById('delay-rate').value = 12;
+              document.getElementById('delay-wait').value = 12;
+              setOutputs(0, 0, 0);
+              break;
+            }
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Please check your inputs.');
+        }
+      });
+
+      // Initialize blanks
+      setOutputs(0, 0, 0);
+    })();
+  </script>
+</body>
+</html>
